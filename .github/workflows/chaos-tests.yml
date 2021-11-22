@@ -1,0 +1,44 @@
+name: chaos-tests
+
+on: 
+  workflow_dispatch:
+    
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    outputs:
+      publicIp: ${{ steps.deploy-bicep.outputs.publicIp}}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy bicep
+        id: deploy-bicep
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            pip=$(az deployment sub create -l uksouth -f ./iac/main.bicep -p adminPassword=${{ secrets.VM_ADMIN_PASSWORD }} --query properties.outputs.publicIp.value -o tsv)
+            echo "::set-output name=publicIp::$pip"
+
+  run_disconnect_test:
+    runs-on: ubuntu-latest
+    needs: [deploy]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Run baseline test
+        uses: k6io/action@v0.1
+        env:
+          HOST: ${{ needs.deploy.outputs.publicIp }}
+        with:
+          filename: ./tests/k6.js
+            
