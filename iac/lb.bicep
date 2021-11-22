@@ -47,27 +47,23 @@ resource lb 'Microsoft.Network/loadBalancers@2021-03-01' = {
           frontendPort: 80
           backendPort: 80
           protocol: 'Tcp'
-          // disableOutboundSnat: true
         }
       }
     ]
-    // outboundRules: [
-    //   {
-    //     name: 'outbound'
-    //     properties: {
-    //       protocol: 'All'
-    //       backendAddressPool: {
-    //         id: resourceId('Microsoft.Network/loadBalancers/backendAddressPools', name, 'backend')
-    //       }
-    //       frontendIPConfigurations: [
-    //         {
-    //           id: resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations', name, 'frontend')
-    //         }
-    //       ]
-    //     }
-    //   }
-    // ]
+    probes: [
+      {
+        name: 'http'
+        properties: {
+          protocol: 'Http'
+          port: 80
+          requestPath: '/'
+          intervalInSeconds: 5
+          numberOfProbes: 2
+        }
+      }
+    ]
   }
 }
 
 output backendPoolId string = lb.properties.backendAddressPools[0].id
+output publicIp string = pip.properties.ipAddress

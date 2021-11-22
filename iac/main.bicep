@@ -35,7 +35,7 @@ module vms 'vm.bicep' = [for item in range(0, numVMs): {
   }
 }]
 
-module vmChaosCapabilities 'vm-chaos-capabilities.bicep' = [for item in range(0, numVMs): {
+module vmChaosCapabilities 'chaos/capabilities/vm-chaos-capabilities.bicep' = [for item in range(0, numVMs): {
   name: 'vmChaosCapabilitiesVm${item}'
   scope: rg
   params: {
@@ -43,10 +43,29 @@ module vmChaosCapabilities 'vm-chaos-capabilities.bicep' = [for item in range(0,
   }
 }]
 
-module halfShutdownExperiment 'experiments/half-vm-shutdown.bicep' = {
+module nsgChaosCapabilities 'chaos/capabilities/nsg-capabilities.bicep' = {
+  scope: rg
+  name: 'nsgChaosCapabilities'
+  params: {
+    nsgName: net.outputs.nsgName
+  }
+}
+
+module halfShutdownExperiment 'chaos/experiments/half-vm-shutdown.bicep' = {
   scope: rg
   name: 'halfShutdownExperiment'
   params: {
     vmIds: [for item in range(0, numVMs): vms[item].outputs.id]
   }
 }
+
+module halfVMDisconnectExperiment 'chaos/experiments/disconnect-half-vms.bicep' = {
+  scope: rg
+  name: 'halfVMDisconnectExperiment'
+  params: {
+    vmPrivateIPs: [for item in range(0, numVMs): '${vms[item].outputs.privateIp}/32']
+    nsgId: net.outputs.nsgId
+  }
+}
+
+output publicIp string = lb.outputs.publicIp

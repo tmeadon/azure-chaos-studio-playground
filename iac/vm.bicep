@@ -1,7 +1,7 @@
 param name string
 param location string = 'uksouth'
 param subnetId string
-param adminUsername string = 'tom'
+param adminUsername string = 'azureuser'
 param lbBackendPoolId string
 
 @secure()
@@ -40,6 +40,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2020-06-01' = {
       computerName: name
       adminUsername: adminUsername
       adminPassword: adminPassword
+      customData: loadFileAsBase64('scripts/cloud-init.yml')
     }
     storageProfile: {
       imageReference: {
@@ -62,16 +63,17 @@ resource vm 'Microsoft.Compute/virtualMachines@2020-06-01' = {
     }
   } 
 
-  resource configure 'runCommands' = {
-    name: 'configure'
-    location: location
-    properties: {
-      source: {
-        script: loadTextContent('scripts/configure-vm.sh')
-      }
-    }
-  }
+  // resource configure 'runCommands' = {
+  //   name: 'configure'
+  //   location: location
+  //   properties: {
+  //     source: {
+  //       script: loadTextContent('scripts/configure-vm.sh')
+  //     }
+  //   }
+  // }
 }
 
 output name string = vm.name
 output id string = vm.id
+output privateIp string = nic.properties.ipConfigurations[0].properties.privateIPAddress

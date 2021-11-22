@@ -20,6 +20,9 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-08-01' = {
         name: 'VMs'
         properties: {
           addressPrefix: '10.0.0.32/27'
+          networkSecurityGroup: {
+            id: nsg.id
+          }
         }
       }
     ]
@@ -57,4 +60,29 @@ resource bastion 'Microsoft.Network/bastionHosts@2020-11-01' = {
   }
 }
 
+resource nsg 'Microsoft.Network/networkSecurityGroups@2021-03-01' = {
+  name: 'nsg'
+  location: location
+  properties: {
+    securityRules: [
+      {
+        name: 'allow-http'
+        properties: {
+          description: 'Allow HTTP access'
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '80'
+          sourceAddressPrefix: '*'
+          destinationAddressPrefix: '*'
+          access: 'Allow'
+          priority: 200
+          direction: 'Inbound'
+        }
+      }
+    ]
+  }
+}
+
 output vmSubnetId string = vnet.properties.subnets[1].id
+output nsgId string = nsg.id
+output nsgName string = nsg.name
