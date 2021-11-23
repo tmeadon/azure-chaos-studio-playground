@@ -2,6 +2,11 @@ name: chaos-tests
 
 on: 
   workflow_dispatch:
+
+env:
+  loadBalancerPipName: lb-pip
+  disconnectExperimentName: half-vm-disconnect
+  resourceGroupName: chaos-playground
     
 jobs:
   deploy:
@@ -21,7 +26,8 @@ jobs:
         uses: azure/CLI@v1
         with:
           inlineScript: |
-            pip=$(az deployment sub create -l uksouth -f ./iac/main.bicep -p adminPassword=${{ secrets.VM_ADMIN_PASSWORD }} --query properties.outputs.publicIp.value -o tsv)
+            az deployment sub create -l uksouth -f ./iac/main.bicep -p adminPassword=${{ secrets.VM_ADMIN_PASSWORD }} --query properties.outputs.publicIp.value -o tsv
+            pip=$(az network public-ip show -n $loadBalancerPipName -g $resourceGroupName --query ipAddress -o tsv)
             echo "::set-output name=publicIp::$pip"
 
   run_disconnect_test:
@@ -35,10 +41,28 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Run baseline test
+      - name: Run k6 test (baseline)
         uses: k6io/action@v0.1
         env:
           HOST: ${{ needs.deploy.outputs.publicIp }}
         with:
           filename: ./tests/k6.js
+          flags: '--quiet'
+
+      - name: Start half disconnect experiment
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            ./scripts/start-experiment.sh $resourceGroupName $disconnectExperimentName
+
+      - name: Wait for NSG changes to take effect
+        run: sleep 60
+
+      - name: Run k6 test
+        uses: k6io/action@v0.1
+        env:
+          HOST: ${{ needs.deploy.outputs.publicIp }}
+        with:
+          filename: ./tests/k6.js
+          flags: '--quiet'
             
