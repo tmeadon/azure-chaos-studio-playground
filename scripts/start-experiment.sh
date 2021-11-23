@@ -11,7 +11,7 @@ START_URL="https://management.azure.com${EXPERIMENT_ID}/start?api-version=2021-0
 STATUS_URL=$(az rest --method post --uri $START_URL --body '{}' --query statusUrl --output tsv)
 STATUS=""
 
-# wait for the experiement to transition to 'running' 
+# wait for the experiment to transition to 'running' 
 while [ "$STATUS" != "Running" ]
 do
     STATUS=$(az rest --method get --uri $STATUS_URL --query properties.status --output tsv)
