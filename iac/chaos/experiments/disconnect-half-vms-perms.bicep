@@ -6,7 +6,7 @@ resource networkContributorRole 'Microsoft.Authorization/roleDefinitions@2018-01
   name: networkContributorRoleId
 }
 
-resource vmContributorAssignments 'Microsoft.Authorization/roleAssignments@2020-08-01-preview' = {
+resource networkContributorAssignments 'Microsoft.Authorization/roleAssignments@2020-08-01-preview' = {
   name: guid(resourceGroup().name, networkContributorRoleId, principalId)
   properties: {
     principalId: principalId
