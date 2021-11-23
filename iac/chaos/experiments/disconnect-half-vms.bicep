@@ -52,9 +52,7 @@ resource nsgExperiment 'Microsoft.Chaos/experiments@2021-09-15-preview' = {
                   }
                   {
                     key: 'destinationAddresses'
-                    value: string([
-                      '10.0.0.37/32'
-                    ])
+                    value: string(ipsToInclude)
                   }
                   {
                     key: 'action'
