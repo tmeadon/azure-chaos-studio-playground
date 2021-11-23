@@ -47,7 +47,7 @@ jobs:
           HOST: ${{ needs.deploy.outputs.publicIp }}
         with:
           filename: ./tests/k6.js
-          flags: '--quiet'
+          # flags: '--quiet'
 
       - name: Start half disconnect experiment
         uses: azure/CLI@v1
@@ -65,5 +65,5 @@ jobs:
           HOST: ${{ needs.deploy.outputs.publicIp }}
         with:
           filename: ./tests/k6.js
-          flags: '--quiet'
+          # flags: '--quiet'
             
