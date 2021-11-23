@@ -53,6 +53,7 @@ jobs:
         uses: azure/CLI@v1
         with:
           inlineScript: |
+            chmod +x ./scripts/start-experiment.sh
             ./scripts/start-experiment.sh $resourceGroupName $disconnectExperimentName
 
       - name: Wait for NSG changes to take effect
