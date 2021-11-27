@@ -61,17 +61,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2020-06-01' = {
         }
       ]
     }
-  } 
-
-  // resource configure 'runCommands' = {
-  //   name: 'configure'
-  //   location: location
-  //   properties: {
-  //     source: {
-  //       script: loadTextContent('scripts/configure-vm.sh')
-  //     }
-  //   }
-  // }
+  }
 }
 
 output name string = vm.name
