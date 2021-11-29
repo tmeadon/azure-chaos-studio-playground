@@ -35,27 +35,11 @@ module vms 'vm.bicep' = [for item in range(0, numVMs): {
   }
 }]
 
-module vmChaosCapabilities 'chaos/capabilities/vm-chaos-capabilities.bicep' = [for item in range(0, numVMs): {
-  name: 'vmChaosCapabilitiesVm${item}'
-  scope: rg
-  params: {
-    vmName: vms[item].outputs.name
-  }
-}]
-
 module nsgChaosCapabilities 'chaos/capabilities/nsg-capabilities.bicep' = {
   scope: rg
   name: 'nsgChaosCapabilities'
   params: {
     nsgName: net.outputs.nsgName
-  }
-}
-
-module halfShutdownExperiment 'chaos/experiments/half-vm-shutdown.bicep' = {
-  scope: rg
-  name: 'halfShutdownExperiment'
-  params: {
-    vmIds: [for item in range(0, numVMs): vms[item].outputs.id]
   }
 }
 
