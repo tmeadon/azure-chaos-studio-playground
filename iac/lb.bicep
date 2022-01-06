@@ -47,6 +47,9 @@ resource lb 'Microsoft.Network/loadBalancers@2021-03-01' = {
           frontendPort: 80
           backendPort: 80
           protocol: 'Tcp'
+          probe: {
+            id: resourceId('Microsoft.Network/loadBalancers/probes', name, 'http')
+          }
         }
       }
     ]
