@@ -79,7 +79,7 @@ resource nsgExperiment 'Microsoft.Chaos/experiments@2021-09-15-preview' = {
                     value: 'Inbound'
                   }
                 ]
-                duration: 'PT5M'
+                duration: 'PT10M'
                 selectorid: 'selector1'
               }
             ]

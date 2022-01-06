@@ -57,7 +57,7 @@ jobs:
             ./scripts/start-experiment.sh $resourceGroupName $disconnectExperimentName
 
       - name: Wait for NSG changes to take effect
-        run: sleep 120
+        run: sleep 180
 
       - name: Run k6 test
         uses: k6io/action@v0.1
